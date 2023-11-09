@@ -49,12 +49,14 @@
     "release": "npm test && esno scripts/release"
   },
   "devDependencies": {
+    "@mantine/form": "^7.2.1",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-replace": "^5.0.4",
     "@types/fs-extra": "^11",
     "@types/jest": "^29.5.6",
     "@types/node": "^20.8.9",
+    "@types/react": "^18",
     "@types/signale": "^1",
     "@types/yargs": "^17.0.29",
     "@typescript-eslint/eslint-plugin": "^6.9.0",
@@ -68,6 +70,7 @@
     "new-github-release-url": "^2.0.0",
     "open": "^9.1.0",
     "prettier": "^3.0.3",
+    "react": "^18.2.0",
     "rimraf": "^5.0.5",
     "rollup": "^4.1.4",
     "rollup-plugin-esbuild": "^6.1.0",
@@ -77,6 +80,11 @@
     "ts-jest": "^29.1.1",
     "typescript": "^5.2.2",
     "version-next": "^1.0.2",
-    "yargs": "^17.7.2"
+    "yargs": "^17.7.2",
+    "zod": "^3.22.4"
+  },
+  "peerDependencies": {
+    "@mantine/form": ">=7.0.0",
+    "zod": ">=3.0.0"
   }
 }

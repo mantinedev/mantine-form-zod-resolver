@@ -1,1 +1,1 @@
-export { add } from './add';
+export { zodResolver } from './zod-resolver';
