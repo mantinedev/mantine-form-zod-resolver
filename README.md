@@ -1,35 +1,109 @@
-# ts-package-template
+# mantine-form-zod-resolver
 
-A template to publish a TypeScript package to npm.
+[zod](https://www.npmjs.com/package/zod) resolver for [@mantine/form](https://mantine.dev/form/use-form/).
 
-Included tools:
+## Installation
 
-- Yarn v4
-- Rollup
-- esbuild
-- jest
-- prettier
-- ESLint
+With yarn:
 
-## Usage
+```sh
+yarn add zod mantine-form-zod-resolver
+```
 
-- Click "Use this template" button to create a new repository from this template
-- Clone the new repository
-- Change `package.json` to your own package name, description, etc. **!important**: change `repository.url` and other repository links to your own repository url
-- Install dependencies: `yarn` (other package managers are not supported)
-- Write your code in `src/` directory
-- Run `npm run release` to build and publish your package to npm
+With npm:
 
-## Publishing to npm
+```sh
+npm install zod mantine-form-zod-resolver
+```
 
-Use `release` script to publish the package:
+## Basic fields validation
 
-- `npm run release` – release a new patch version to npm
-- `npm run release minor` – release a new minor version to npm
-- `npm run release major` – release a new major version to npm
-- `npm run release minor -- --stage alpha` – release a new minor alpha version to npm (for example, `1.1.0-alpha.0`)
+```tsx
+import { z } from 'zod';
+import { useForm } from '@mantine/form';
+import { zodResolver } from 'mantine-form-zod-resolver';
 
-Note that release script will always publish public packages to npm. If you want to publish a private package, change release script in `scripts/release.ts`.
+const schema = z.object({
+  name: z.string().min(2, { message: 'Name should have at least 2 letters' }),
+  email: z.string().email({ message: 'Invalid email' }),
+  age: z.number().min(18, { message: 'You must be at least 18 to create an account' }),
+});
+
+const form = useForm({
+  initialValues: {
+    name: '',
+    email: '',
+    age: 16,
+  },
+  validate: zodResolver(schema),
+});
+
+form.validate();
+form.errors;
+// -> {
+//  name: 'Name should have at least 2 letters',
+//  email: 'Invalid email',
+//  age: 'You must be at least 18 to create an account'
+// }
+```
+
+## Nested fields validation
+
+```tsx
+import { z } from 'zod';
+import { useForm } from '@mantine/form';
+import { zodResolver } from 'mantine-form-zod-resolver';
+
+const nestedSchema = z.object({
+  nested: z.object({
+    field: z.string().min(2, { message: 'Field should have at least 2 letters' }),
+  }),
+});
+
+const form = useForm({
+  initialValues: {
+    nested: {
+      field: '',
+    },
+  },
+  validate: zodResolver(nestedSchema),
+});
+
+form.validate();
+form.errors;
+// -> {
+//  'nested.field': 'Field should have at least 2 letters',
+// }
+```
+
+## List fields validation
+
+```tsx
+import { z } from 'zod';
+import { useForm } from '@mantine/form';
+import { zodResolver } from 'mantine-form-zod-resolver';
+
+const listSchema = z.object({
+  list: z.array(
+    z.object({
+      name: z.string().min(2, { message: 'Name should have at least 2 letters' }),
+    })
+  ),
+});
+
+const form = useForm({
+  initialValues: {
+    list: [{ name: '' }],
+  },
+  validate: zodResolver(listSchema),
+});
+
+form.validate();
+form.errors;
+// -> {
+//  'list.0.name': 'Name should have at least 2 letters',
+// }
+```
 
 ## License
 

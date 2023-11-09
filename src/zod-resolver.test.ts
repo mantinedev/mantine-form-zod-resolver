@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { act, renderHook } from '@testing-library/react';
 import { useForm } from '@mantine/form';
-import { zodResolver } from '@mantine/form';
+import { zodResolver } from './zod-resolver';
 
 const schema = z.object({
   name: z.string().min(2, { message: 'Name should have at least 2 letters' }),
