@@ -68,3 +68,34 @@ it('validates nested fields with given zod schema', () => {
 
   expect(hook.result.current.errors).toStrictEqual({});
 });
+
+const listSchema = z.object({
+  list: z.array(
+    z.object({
+      name: z.string().min(2, { message: 'Name should have at least 2 letters' }),
+    })
+  ),
+});
+
+it('validates list fields with given zod schema', () => {
+  const hook = renderHook(() =>
+    useForm({
+      initialValues: {
+        list: [{ name: '' }],
+      },
+      validate: zodResolver(listSchema),
+    })
+  );
+
+  expect(hook.result.current.errors).toStrictEqual({});
+  act(() => hook.result.current.validate());
+
+  expect(hook.result.current.errors).toStrictEqual({
+    'list.0.name': 'Name should have at least 2 letters',
+  });
+
+  act(() => hook.result.current.setValues({ list: [{ name: 'John' }] }));
+  act(() => hook.result.current.validate());
+
+  expect(hook.result.current.errors).toStrictEqual({});
+});
