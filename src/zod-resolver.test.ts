@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { act, renderHook } from '@testing-library/react';
 import { useForm } from '@mantine/form';
-import { zodResolver } from './zod-resolver';
+import { ZodResolverOptions, zodResolver } from './zod-resolver';
 
 const schema = z.object({
   name: z.string().min(2, { message: 'Name should have at least 2 letters' }),
@@ -99,3 +99,52 @@ it('validates list fields with given zod schema', () => {
 
   expect(hook.result.current.errors).toStrictEqual({});
 });
+
+const mandatoryHashMessage = 'There must be a # in the hashtag';
+const notEmptyMessage = 'Hashtag should not be empty';
+
+const multipleMessagesForAFieldShema = z.object({
+  hashtag: z
+    .string()
+    .refine((value) => value.length > 0, {
+      message: notEmptyMessage,
+    })
+    .refine((value) => value.includes('#'), {
+      message: mandatoryHashMessage,
+    }),
+});
+
+it.each([
+  [
+    {
+      errorPriority: 'first',
+    },
+    notEmptyMessage,
+  ],
+  [
+    {
+      errorPriority: 'last',
+    },
+    mandatoryHashMessage,
+  ],
+  [undefined, mandatoryHashMessage],
+])(
+  `provides the proper error for a schema with multiple messages for a field with resolver option %p`,
+  (options, expectedErrorMessage) => {
+    const hook = renderHook(() =>
+      useForm({
+        initialValues: {
+          hashtag: '',
+        },
+        validate: zodResolver(multipleMessagesForAFieldShema, options as ZodResolverOptions),
+      })
+    );
+
+    expect(hook.result.current.errors).toStrictEqual({});
+    act(() => hook.result.current.validate());
+
+    expect(hook.result.current.errors).toStrictEqual({
+      hashtag: expectedErrorMessage,
+    });
+  }
+);
