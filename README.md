@@ -105,6 +105,16 @@ form.errors;
 // }
 ```
 
+## API:
+
+### ZodResolverOptions
+
+`zodResolver` takes as an optional second parameter some `zodResolverOptions`.
+
+| Name            | Type                           | Description                                                                                                                                                                                                                        |
+| --------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `errorPriority` | `first` \| `last` \| undefined | In case a field can display multiple error message, set `errorPriority` to `first` to display the message of the first failing check, or set `errorPriority` to `last` to display the message of the last failing check (default). |
+
 ## License
 
 MIT
