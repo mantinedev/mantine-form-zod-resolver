@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { act, renderHook } from '@testing-library/react';
 import { useForm } from '@mantine/form';
 import { ZodResolverOptions, zodResolver } from './zod-resolver';
