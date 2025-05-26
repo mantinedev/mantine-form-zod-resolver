@@ -16,6 +16,18 @@ With npm:
 npm install zod mantine-form-zod-resolver
 ```
 
+## Zod versions
+
+`mantine-form-zod-resolver` supports zod v3 and v4:
+
+```tsx
+// For zod v3
+import { zodResolver } from 'mantine-form-zod-resolver';
+
+// For zod v4
+import { zod4Resolver } from 'mantine-form-zod-resolver';
+```
+
 ## Basic fields validation
 
 ```tsx
