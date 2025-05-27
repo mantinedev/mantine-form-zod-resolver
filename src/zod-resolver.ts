@@ -1,4 +1,4 @@
-import type { ZodType } from 'zod/v4';
+import { parse, $ZodError, type $ZodType } from 'zod/v4/core';
 import type { Schema } from 'zod';
 import type { FormErrors } from '@mantine/form';
 
@@ -29,25 +29,26 @@ export function zodResolver(schema: Schema, options?: ZodResolverOptions) {
   };
 }
 
-export function zod4Resolver(schema: ZodType, options?: ZodResolverOptions) {
+export function zod4Resolver(schema: $ZodType, options?: ZodResolverOptions) {
   return (values: Record<string, unknown>): FormErrors => {
-    const parsed = schema.safeParse(values);
+    try {
+      parse(schema, values);
 
-    if (parsed.success) {
       return {};
-    }
+    } catch (error) {
+      if (error instanceof $ZodError) {
+        const results: FormErrors = {};
 
-    const results: FormErrors = {};
+        if (options?.errorPriority === 'first') {
+          error.issues.reverse();
+        }
+        error.issues.forEach((issue) => {
+          results[issue.path.join('.')] = issue.message;
+        });
 
-    if ('error' in parsed) {
-      if (options?.errorPriority === 'first') {
-        parsed.error.issues.reverse();
+        return results;
       }
-      parsed.error.issues.forEach((error) => {
-        results[error.path.join('.')] = error.message;
-      });
+      throw error; // rethrow if it's not a ZodError
     }
-
-    return results;
   };
 }
