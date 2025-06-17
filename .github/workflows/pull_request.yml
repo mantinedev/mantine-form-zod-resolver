@@ -16,10 +16,10 @@ jobs:
       - name: Get Yarn cache path
         id: yarn-cache
         run: echo "::set-output name=dir::$(yarn cache dir)"
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
         with:
-          node-version: '20.9.0'
+          node-version-file: '.nvmrc'
       - name: Load Yarn cache
         uses: actions/cache@v4
         with:
@@ -28,6 +28,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn
       - name: Run tests
         run: npm test
