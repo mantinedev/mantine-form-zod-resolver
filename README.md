@@ -117,6 +117,33 @@ form.errors;
 // }
 ```
 
+## Async validation
+
+The resolver supports asynchronous zod refinements:
+
+```tsx
+import { z } from 'zod';
+import { useForm } from '@mantine/form';
+import { zodResolver } from 'mantine-form-zod-resolver';
+
+const schema = z.object({
+  username: z.string().refine(async (value) => value === 'available', {
+    message: 'Username is already taken',
+  }),
+});
+
+const form = useForm({
+  initialValues: { username: 'taken' },
+  validate: zodResolver(schema),
+});
+
+await form.validate();
+form.errors;
+// -> {
+//  username: 'Username is already taken',
+// }
+```
+
 ## API:
 
 ### ZodResolverOptions
@@ -126,6 +153,7 @@ form.errors;
 | Name            | Type                           | Description                                                                                                                                                                                                                        |
 | --------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `errorPriority` | `first` \| `last` \| undefined | In case a field can display multiple error message, set `errorPriority` to `first` to display the message of the first failing check, or set `errorPriority` to `last` to display the message of the last failing check (default). |
+| `mode`          | `auto` \| `sync` \| `async`    | Controls return type and parse strategy. `auto` (default) runs sync first and falls back to async for async schemas (`FormErrors \| Promise<FormErrors>`). `sync` always returns `FormErrors` and throws for async refinements. `async` always returns `Promise<FormErrors>`. |
 
 ## License
 

@@ -148,3 +148,72 @@ it.each([
     });
   }
 );
+
+const asyncSchema = z.object({
+  username: z.string().refine(async (value) => value === 'available', {
+    message: 'Username is already taken',
+  }),
+});
+
+it('supports async zod refinements', async () => {
+  const hook = renderHook(() =>
+    useForm({
+      initialValues: {
+        username: 'taken',
+      },
+      validate: zodResolver(asyncSchema),
+    })
+  );
+
+  expect(hook.result.current.errors).toStrictEqual({});
+  await act(async () => {
+    await hook.result.current.validate();
+  });
+
+  expect(hook.result.current.errors).toStrictEqual({
+    username: 'Username is already taken',
+  });
+
+  act(() => hook.result.current.setValues({ username: 'available' }));
+  await act(async () => {
+    await hook.result.current.validate();
+  });
+
+  expect(hook.result.current.errors).toStrictEqual({});
+});
+
+it('supports explicit async mode with a sync schema', async () => {
+  const hook = renderHook(() =>
+    useForm({
+      initialValues: {
+        name: '',
+        email: '',
+        age: 16,
+      },
+      validate: zodResolver(schema, { mode: 'async' }),
+    })
+  );
+
+  await act(async () => {
+    await hook.result.current.validate();
+  });
+
+  expect(hook.result.current.errors).toStrictEqual({
+    name: 'Name should have at least 2 letters',
+    email: 'Invalid email',
+    age: 'You must be at least 18 to create an account',
+  });
+});
+
+it('throws in sync mode when schema has async refinements', () => {
+  const hook = renderHook(() =>
+    useForm({
+      initialValues: {
+        username: 'taken',
+      },
+      validate: zodResolver(asyncSchema, { mode: 'sync' }),
+    })
+  );
+
+  expect(() => hook.result.current.validate()).toThrow('parseAsync');
+});
