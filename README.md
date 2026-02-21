@@ -16,22 +16,14 @@ With npm:
 npm install zod mantine-form-zod-resolver
 ```
 
-## Zod versions
+## Zod version
 
-`mantine-form-zod-resolver` supports zod v3 and v4:
-
-```tsx
-// For zod v3
-import { zodResolver } from 'mantine-form-zod-resolver';
-
-// For zod v4
-import { zod4Resolver } from 'mantine-form-zod-resolver';
-```
+`mantine-form-zod-resolver` supports zod v4.
 
 ## Basic fields validation
 
 ```tsx
-import { z } from 'zod';
+import * as z from 'zod';
 import { useForm } from '@mantine/form';
 import { zodResolver } from 'mantine-form-zod-resolver';
 
@@ -62,7 +54,7 @@ form.errors;
 ## Nested fields validation
 
 ```tsx
-import { z } from 'zod';
+import * as z from 'zod';
 import { useForm } from '@mantine/form';
 import { zodResolver } from 'mantine-form-zod-resolver';
 
@@ -91,7 +83,7 @@ form.errors;
 ## List fields validation
 
 ```tsx
-import { z } from 'zod';
+import * as z from 'zod';
 import { useForm } from '@mantine/form';
 import { zodResolver } from 'mantine-form-zod-resolver';
 
@@ -117,15 +109,44 @@ form.errors;
 // }
 ```
 
+## Async validation
+
+The resolver supports asynchronous zod refinements, but async mode must be enabled explicitly with
+`mode: 'async'`. By default, resolver runs in sync mode.
+
+```tsx
+import { z } from 'zod/v4';
+import { useForm } from '@mantine/form';
+import { zodResolver } from 'mantine-form-zod-resolver';
+
+const schema = z.object({
+  username: z.string().refine(async (value) => value === 'available', {
+    message: 'Username is already taken',
+  }),
+});
+
+const form = useForm({
+  initialValues: { username: 'taken' },
+  validate: zodResolver(schema, { mode: 'async' }),
+});
+
+await form.validate();
+form.errors;
+// -> {
+//  username: 'Username is already taken',
+// }
+```
+
 ## API:
 
 ### ZodResolverOptions
 
 `zodResolver` takes as an optional second parameter some `zodResolverOptions`.
 
-| Name            | Type                           | Description                                                                                                                                                                                                                        |
-| --------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `errorPriority` | `first` \| `last` \| undefined | In case a field can display multiple error message, set `errorPriority` to `first` to display the message of the first failing check, or set `errorPriority` to `last` to display the message of the last failing check (default). |
+| Name            | Type                           | Description                                                                                                                                                                                                                                                                   |
+| --------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `errorPriority` | `first` \| `last` \| undefined | In case a field can display multiple error message, set `errorPriority` to `first` to display the message of the first failing check, or set `errorPriority` to `last` to display the message of the last failing check (default).                                            |
+| `mode`          | `sync` \| `async`              | Controls return type and parse strategy. `sync` is the default and returns `FormErrors`; async refinements throw in this mode. Set `mode` to `async` to enable async refinements and get `Promise<FormErrors>`.                                                          |
 
 ## License
 

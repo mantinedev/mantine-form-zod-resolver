@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { act, renderHook } from '@testing-library/react';
 import { useForm } from '@mantine/form';
 import { ZodResolverOptions, zodResolver } from './zod-resolver';
@@ -17,7 +17,7 @@ it('validates basic fields with given zod schema', () => {
         email: '',
         age: 16,
       },
-      validate: zodResolver(schema),
+      validate: zodResolver(schema) as any,
     })
   );
 
@@ -52,7 +52,7 @@ it('validates nested fields with given zod schema', () => {
           field: '',
         },
       },
-      validate: zodResolver(nestedSchema),
+      validate: zodResolver(nestedSchema) as any,
     })
   );
 
@@ -83,7 +83,7 @@ it('validates list fields with given zod schema', () => {
       initialValues: {
         list: [{ name: '' }],
       },
-      validate: zodResolver(listSchema),
+      validate: zodResolver(listSchema) as any,
     })
   );
 
@@ -136,7 +136,7 @@ it.each([
         initialValues: {
           hashtag: '',
         },
-        validate: zodResolver(multipleMessagesForAFieldShema, options as ZodResolverOptions),
+        validate: zodResolver(multipleMessagesForAFieldShema, options as ZodResolverOptions) as any,
       })
     );
 
@@ -148,3 +148,54 @@ it.each([
     });
   }
 );
+
+const asyncSchema = z.object({
+  username: z.string().refine(async (value) => value === 'available', {
+    message: 'Username is already taken',
+  }),
+});
+
+it('supports async zod refinements', async () => {
+  const validate = zodResolver(asyncSchema, { mode: 'async' });
+
+  await expect(validate({ username: 'taken' })).resolves.toStrictEqual({
+    username: 'Username is already taken',
+  });
+  await expect(validate({ username: 'available' })).resolves.toStrictEqual({});
+});
+
+it('supports explicit async mode with a sync schema', async () => {
+  const validate = zodResolver(schema, { mode: 'async' });
+
+  await expect(validate({ name: '', email: '', age: 16 })).resolves.toStrictEqual({
+    name: 'Name should have at least 2 letters',
+    email: 'Invalid email',
+    age: 'You must be at least 18 to create an account',
+  });
+});
+
+it('throws in default sync mode when schema has async refinements', () => {
+  const hook = renderHook(() =>
+    useForm({
+      initialValues: {
+        username: 'taken',
+      },
+      validate: zodResolver(asyncSchema) as any,
+    })
+  );
+
+  expect(() => hook.result.current.validate()).toThrow('parseAsync');
+});
+
+it('throws in explicit sync mode when schema has async refinements', () => {
+  const hook = renderHook(() =>
+    useForm({
+      initialValues: {
+        username: 'taken',
+      },
+      validate: zodResolver(asyncSchema, { mode: 'sync' }) as any,
+    })
+  );
+
+  expect(() => hook.result.current.validate()).toThrow('parseAsync');
+});
