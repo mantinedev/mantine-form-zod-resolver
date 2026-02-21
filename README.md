@@ -111,10 +111,11 @@ form.errors;
 
 ## Async validation
 
-The resolver supports asynchronous zod refinements:
+The resolver supports asynchronous zod refinements, but async mode must be enabled explicitly with
+`mode: 'async'`. By default, resolver runs in sync mode.
 
 ```tsx
-import * as z from 'zod';
+import { z } from 'zod/v4';
 import { useForm } from '@mantine/form';
 import { zodResolver } from 'mantine-form-zod-resolver';
 
@@ -126,7 +127,7 @@ const schema = z.object({
 
 const form = useForm({
   initialValues: { username: 'taken' },
-  validate: zodResolver(schema),
+  validate: zodResolver(schema, { mode: 'async' }),
 });
 
 await form.validate();
@@ -145,7 +146,7 @@ form.errors;
 | Name            | Type                           | Description                                                                                                                                                                                                                                                                   |
 | --------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `errorPriority` | `first` \| `last` \| undefined | In case a field can display multiple error message, set `errorPriority` to `first` to display the message of the first failing check, or set `errorPriority` to `last` to display the message of the last failing check (default).                                            |
-| `mode`          | `auto` \| `sync` \| `async`    | Controls return type and parse strategy. `auto` (default) runs sync first and falls back to async for async schemas (`FormErrors \| Promise<FormErrors>`). `sync` always returns `FormErrors` and throws for async refinements. `async` always returns `Promise<FormErrors>`. |
+| `mode`          | `sync` \| `async`              | Controls return type and parse strategy. `sync` is the default and returns `FormErrors`; async refinements throw in this mode. Set `mode` to `async` to enable async refinements and get `Promise<FormErrors>`.                                                          |
 
 ## License
 

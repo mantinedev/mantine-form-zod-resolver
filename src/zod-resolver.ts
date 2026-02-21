@@ -3,7 +3,7 @@ import type { FormErrors } from '@mantine/form';
 
 export interface ZodResolverOptions {
   errorPriority?: 'first' | 'last';
-  mode?: 'auto' | 'sync' | 'async';
+  mode?: 'sync' | 'async';
 }
 
 type ValidationResult = FormErrors | Promise<FormErrors>;
@@ -80,12 +80,7 @@ export function zodResolver(schema: $ZodType, options?: ZodResolverOptions) {
       if (!isAsyncParseError(error)) {
         throw error;
       }
-
-      if (options?.mode === 'sync') {
-        throw error;
-      }
-
-      return resolveWithZodV4Async(schema, values, options);
+      throw error;
     }
   };
 }

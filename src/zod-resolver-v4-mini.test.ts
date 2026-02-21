@@ -163,7 +163,7 @@ it('supports async zod v4 mini refinements', async () => {
       initialValues: {
         username: 'taken',
       },
-      validate: zodResolver(asyncSchema),
+      validate: zodResolver(asyncSchema, { mode: 'async' }),
     })
   );
 
@@ -207,7 +207,20 @@ it('supports explicit async mode with a sync zod v4 mini schema', async () => {
   });
 });
 
-it('throws in sync mode when zod v4 mini schema has async refinements', () => {
+it('throws in default sync mode when zod v4 mini schema has async refinements', () => {
+  const hook = renderHook(() =>
+    useForm({
+      initialValues: {
+        username: 'taken',
+      },
+      validate: zodResolver(asyncSchema),
+    })
+  );
+
+  expect(() => hook.result.current.validate()).toThrow('parseAsync');
+});
+
+it('throws in explicit sync mode when zod v4 mini schema has async refinements', () => {
   const hook = renderHook(() =>
     useForm({
       initialValues: {
