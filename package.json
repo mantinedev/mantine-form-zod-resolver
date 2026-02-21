@@ -40,8 +40,8 @@
     "clean": "rimraf dist",
     "generate-dts": "esno scripts/generate-dts",
     "build": "rollup -c rollup.config.mjs && npm run generate-dts",
-    "prettier:check": "prettier --check \"**/*.{ts,tsx}\"",
-    "prettier:write": "prettier --write \"**/*.{ts,tsx}\"",
+    "prettier:check": "node ./node_modules/prettier/bin/prettier.cjs --check \"**/*.{ts,tsx}\"",
+    "prettier:write": "node ./node_modules/prettier/bin/prettier.cjs --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit",
     "lint": "eslint --cache --ext .ts,.tsx .",
     "jest": "jest",
@@ -49,7 +49,7 @@
     "release": "npm test && esno scripts/release"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
+    "@eslint/js": "^9.39.1",
     "@mantine/form": "^8.3.15",
     "@rollup/plugin-commonjs": "^29.0.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
@@ -67,7 +67,7 @@
     "@types/signale": "^1.4.7",
     "@types/yargs": "^17.0.35",
     "esbuild": "^0.27.3",
-    "eslint": "^10.0.1",
+    "eslint": "^9.39.1",
     "eslint-config-mantine": "^4.0.3",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.5",

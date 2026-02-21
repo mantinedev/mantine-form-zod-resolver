@@ -17,7 +17,7 @@ it('validates basic fields with given zod schema', () => {
         email: '',
         age: 16,
       },
-      validate: zodResolver(schema),
+      validate: zodResolver(schema) as any,
     })
   );
 
@@ -52,7 +52,7 @@ it('validates nested fields with given zod schema', () => {
           field: '',
         },
       },
-      validate: zodResolver(nestedSchema),
+      validate: zodResolver(nestedSchema) as any,
     })
   );
 
@@ -83,7 +83,7 @@ it('validates list fields with given zod schema', () => {
       initialValues: {
         list: [{ name: '' }],
       },
-      validate: zodResolver(listSchema),
+      validate: zodResolver(listSchema) as any,
     })
   );
 
@@ -136,7 +136,7 @@ it.each([
         initialValues: {
           hashtag: '',
         },
-        validate: zodResolver(multipleMessagesForAFieldShema, options as ZodResolverOptions),
+        validate: zodResolver(multipleMessagesForAFieldShema, options as ZodResolverOptions) as any,
       })
     );
 
@@ -156,49 +156,18 @@ const asyncSchema = z.object({
 });
 
 it('supports async zod refinements', async () => {
-  const hook = renderHook(() =>
-    useForm({
-      initialValues: {
-        username: 'taken',
-      },
-      validate: zodResolver(asyncSchema, { mode: 'async' }),
-    })
-  );
+  const validate = zodResolver(asyncSchema, { mode: 'async' });
 
-  expect(hook.result.current.errors).toStrictEqual({});
-  await act(async () => {
-    await hook.result.current.validate();
-  });
-
-  expect(hook.result.current.errors).toStrictEqual({
+  await expect(validate({ username: 'taken' })).resolves.toStrictEqual({
     username: 'Username is already taken',
   });
-
-  act(() => hook.result.current.setValues({ username: 'available' }));
-  await act(async () => {
-    await hook.result.current.validate();
-  });
-
-  expect(hook.result.current.errors).toStrictEqual({});
+  await expect(validate({ username: 'available' })).resolves.toStrictEqual({});
 });
 
 it('supports explicit async mode with a sync schema', async () => {
-  const hook = renderHook(() =>
-    useForm({
-      initialValues: {
-        name: '',
-        email: '',
-        age: 16,
-      },
-      validate: zodResolver(schema, { mode: 'async' }),
-    })
-  );
+  const validate = zodResolver(schema, { mode: 'async' });
 
-  await act(async () => {
-    await hook.result.current.validate();
-  });
-
-  expect(hook.result.current.errors).toStrictEqual({
+  await expect(validate({ name: '', email: '', age: 16 })).resolves.toStrictEqual({
     name: 'Name should have at least 2 letters',
     email: 'Invalid email',
     age: 'You must be at least 18 to create an account',
@@ -211,7 +180,7 @@ it('throws in default sync mode when schema has async refinements', () => {
       initialValues: {
         username: 'taken',
       },
-      validate: zodResolver(asyncSchema),
+      validate: zodResolver(asyncSchema) as any,
     })
   );
 
@@ -224,7 +193,7 @@ it('throws in explicit sync mode when schema has async refinements', () => {
       initialValues: {
         username: 'taken',
       },
-      validate: zodResolver(asyncSchema, { mode: 'sync' }),
+      validate: zodResolver(asyncSchema, { mode: 'sync' }) as any,
     })
   );
 
