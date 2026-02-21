@@ -16,22 +16,14 @@ With npm:
 npm install zod mantine-form-zod-resolver
 ```
 
-## Zod versions
+## Zod version
 
-`mantine-form-zod-resolver` supports zod v3 and v4:
-
-```tsx
-// For zod v3
-import { zodResolver } from 'mantine-form-zod-resolver';
-
-// For zod v4
-import { zod4Resolver } from 'mantine-form-zod-resolver';
-```
+`mantine-form-zod-resolver` supports zod v4.
 
 ## Basic fields validation
 
 ```tsx
-import { z } from 'zod';
+import * as z from 'zod';
 import { useForm } from '@mantine/form';
 import { zodResolver } from 'mantine-form-zod-resolver';
 
@@ -62,7 +54,7 @@ form.errors;
 ## Nested fields validation
 
 ```tsx
-import { z } from 'zod';
+import * as z from 'zod';
 import { useForm } from '@mantine/form';
 import { zodResolver } from 'mantine-form-zod-resolver';
 
@@ -91,7 +83,7 @@ form.errors;
 ## List fields validation
 
 ```tsx
-import { z } from 'zod';
+import * as z from 'zod';
 import { useForm } from '@mantine/form';
 import { zodResolver } from 'mantine-form-zod-resolver';
 
@@ -122,7 +114,7 @@ form.errors;
 The resolver supports asynchronous zod refinements:
 
 ```tsx
-import { z } from 'zod';
+import * as z from 'zod';
 import { useForm } from '@mantine/form';
 import { zodResolver } from 'mantine-form-zod-resolver';
 
@@ -150,9 +142,9 @@ form.errors;
 
 `zodResolver` takes as an optional second parameter some `zodResolverOptions`.
 
-| Name            | Type                           | Description                                                                                                                                                                                                                        |
-| --------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `errorPriority` | `first` \| `last` \| undefined | In case a field can display multiple error message, set `errorPriority` to `first` to display the message of the first failing check, or set `errorPriority` to `last` to display the message of the last failing check (default). |
+| Name            | Type                           | Description                                                                                                                                                                                                                                                                   |
+| --------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `errorPriority` | `first` \| `last` \| undefined | In case a field can display multiple error message, set `errorPriority` to `first` to display the message of the first failing check, or set `errorPriority` to `last` to display the message of the last failing check (default).                                            |
 | `mode`          | `auto` \| `sync` \| `async`    | Controls return type and parse strategy. `auto` (default) runs sync first and falls back to async for async schemas (`FormErrors \| Promise<FormErrors>`). `sync` always returns `FormErrors` and throws for async refinements. `async` always returns `Promise<FormErrors>`. |
 
 ## License

@@ -1,1 +1,1 @@
-export { zodResolver, zod4Resolver } from './zod-resolver';
+export { zodResolver } from './zod-resolver';

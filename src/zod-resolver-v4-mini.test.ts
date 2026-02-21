@@ -1,7 +1,7 @@
 import { z } from 'zod/v4-mini';
 import { act, renderHook } from '@testing-library/react';
 import { useForm } from '@mantine/form';
-import { ZodResolverOptions, zod4Resolver } from './zod-resolver';
+import { ZodResolverOptions, zodResolver } from './zod-resolver';
 
 const schema = z.object({
   name: z.string().check(z.minLength(2, { message: 'Name should have at least 2 letters' })),
@@ -17,7 +17,7 @@ it('validates basic fields with given zod schema', () => {
         email: '',
         age: 16,
       },
-      validate: zod4Resolver(schema),
+      validate: zodResolver(schema),
     })
   );
 
@@ -52,7 +52,7 @@ it('validates nested fields with given zod schema', () => {
           field: '',
         },
       },
-      validate: zod4Resolver(nestedSchema),
+      validate: zodResolver(nestedSchema),
     })
   );
 
@@ -83,7 +83,7 @@ it('validates list fields with given zod schema', () => {
       initialValues: {
         list: [{ name: '' }],
       },
-      validate: zod4Resolver(listSchema),
+      validate: zodResolver(listSchema),
     })
   );
 
@@ -136,7 +136,7 @@ it.each([
         initialValues: {
           hashtag: '',
         },
-        validate: zod4Resolver(multipleMessagesForAFieldSchema, options as ZodResolverOptions),
+        validate: zodResolver(multipleMessagesForAFieldSchema, options as ZodResolverOptions),
       })
     );
 
@@ -163,7 +163,7 @@ it('supports async zod v4 mini refinements', async () => {
       initialValues: {
         username: 'taken',
       },
-      validate: zod4Resolver(asyncSchema),
+      validate: zodResolver(asyncSchema),
     })
   );
 
@@ -192,7 +192,7 @@ it('supports explicit async mode with a sync zod v4 mini schema', async () => {
         email: '',
         age: 16,
       },
-      validate: zod4Resolver(schema, { mode: 'async' }),
+      validate: zodResolver(schema, { mode: 'async' }),
     })
   );
 
@@ -213,7 +213,7 @@ it('throws in sync mode when zod v4 mini schema has async refinements', () => {
       initialValues: {
         username: 'taken',
       },
-      validate: zod4Resolver(asyncSchema, { mode: 'sync' }),
+      validate: zodResolver(asyncSchema, { mode: 'sync' }),
     })
   );
 

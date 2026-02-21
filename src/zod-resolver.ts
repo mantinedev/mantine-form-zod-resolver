@@ -1,5 +1,4 @@
 import { safeParse, safeParseAsync, type $ZodType } from 'zod/v4/core';
-import type { Schema } from 'zod';
 import type { FormErrors } from '@mantine/form';
 
 export interface ZodResolverOptions {
@@ -24,34 +23,6 @@ function getValidationErrors(issues: ZodIssue[], options?: ZodResolverOptions): 
 
 function isAsyncParseError(error: unknown): error is Error {
   return error instanceof Error && error.message.includes('parseAsync');
-}
-
-function resolveWithZodV3(
-  schema: Schema,
-  values: Record<string, unknown>,
-  options?: ZodResolverOptions
-) {
-  const parsed = schema.safeParse(values);
-
-  if (parsed.success) {
-    return {};
-  }
-
-  return getValidationErrors(parsed.error.errors, options);
-}
-
-function resolveWithZodV3Async(
-  schema: Schema,
-  values: Record<string, unknown>,
-  options?: ZodResolverOptions
-) {
-  return schema.safeParseAsync(values).then((parsed) => {
-    if (parsed.success) {
-      return {};
-    }
-
-    return getValidationErrors(parsed.error.errors, options);
-  });
 }
 
 function resolveWithZodV4(
@@ -83,55 +54,21 @@ function resolveWithZodV4Async(
 }
 
 export function zodResolver(
-  schema: Schema,
+  schema: $ZodType,
   options: ZodResolverOptions & { mode: 'sync' }
 ): (values: Record<string, unknown>) => FormErrors;
 
 export function zodResolver(
-  schema: Schema,
+  schema: $ZodType,
   options: ZodResolverOptions & { mode: 'async' }
 ): (values: Record<string, unknown>) => Promise<FormErrors>;
 
 export function zodResolver(
-  schema: Schema,
-  options?: ZodResolverOptions
-): (values: Record<string, unknown>) => ValidationResult;
-
-export function zodResolver(schema: Schema, options?: ZodResolverOptions) {
-  return (values: Record<string, unknown>): ValidationResult => {
-    if (options?.mode === 'async') {
-      return resolveWithZodV3Async(schema, values, options);
-    }
-
-    try {
-      return resolveWithZodV3(schema, values, options);
-    } catch (error) {
-      if (!isAsyncParseError(error)) {
-        throw error;
-      }
-
-      if (options?.mode === 'sync') {
-        throw error;
-      }
-
-      return resolveWithZodV3Async(schema, values, options);
-    }
-  };
-}
-
-export function zod4Resolver(
-  schema: $ZodType,
-  options: ZodResolverOptions & { mode: 'sync' }
-): (values: Record<string, unknown>) => FormErrors;
-export function zod4Resolver(
-  schema: $ZodType,
-  options: ZodResolverOptions & { mode: 'async' }
-): (values: Record<string, unknown>) => Promise<FormErrors>;
-export function zod4Resolver(
   schema: $ZodType,
   options?: ZodResolverOptions
 ): (values: Record<string, unknown>) => ValidationResult;
-export function zod4Resolver(schema: $ZodType, options?: ZodResolverOptions) {
+
+export function zodResolver(schema: $ZodType, options?: ZodResolverOptions) {
   return (values: Record<string, unknown>): ValidationResult => {
     if (options?.mode === 'async') {
       return resolveWithZodV4Async(schema, values, options);
@@ -141,7 +78,7 @@ export function zod4Resolver(schema: $ZodType, options?: ZodResolverOptions) {
       return resolveWithZodV4(schema, values, options);
     } catch (error) {
       if (!isAsyncParseError(error)) {
-        throw error; // rethrow if it's not async-related
+        throw error;
       }
 
       if (options?.mode === 'sync') {
